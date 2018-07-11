@@ -9,8 +9,7 @@ var Battle = require('./Battle');
 var Switch = ReactRouter.Switch;
 var Results = require('./Results');
 
-
-class App extends React.Component{
+class App extends React.Component {
     render(){
         return (
             <BrowserRouter>
