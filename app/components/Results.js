@@ -1,22 +1,34 @@
-var React = require('react');
-var queryString = require('query-string');
-var api = require('../utils/api');
-var Link = require('react-router-dom').Link;
-var PropTypes = require('prop-types');
-var PlayerPreview = require('./PlayerPreview');
-var Loading = require('./Loading');
-function Profile (props) {
-    var info = props.info;
+const React = require('react');
+const queryString = require('query-string');
+const api = require('../utils/api');
+const Link = require('react-router-dom').Link;
+const PropTypes = require('prop-types');
+const PlayerPreview = require('./PlayerPreview');
+const Loading = require('./Loading');
+
+function Profile ({info}) {
+    const {
+        login,
+        avatar_url,
+        name,
+        location,
+        company,
+        followers,
+        following,
+        public_repos,
+        blog
+    } = info;
+
     return (
-        <PlayerPreview username={info.login} avatar={info.avatar_url}>
+        <PlayerPreview username={login} avatar={avatar_url}>
             <ul className='space-list-items'>
-                {info.name && <li>{info.name}</li>}
-                {info.location && <li>{info.location}</li>}
-                {info.company && <li>{info.company}</li>}
-                <li>Followers: {info.followers}</li>
-                <li>Following: {info.following}</li>
-                <li>Public Repos: {info.public_repos}</li>
-                {info.blog && <li><a href={info.blog}>{info.blog}</a></li>}
+                {name && <li>{name}</li>}
+                {location && <li>{location}</li>}
+                {company && <li>{company}</li>}
+                <li>Followers: {followers}</li>
+                <li>Following: {following}</li>
+                <li>Public Repos: {public_repos}</li>
+                {blog && <li><a href={blog}>{blog}</a></li>}
             </ul>
         </PlayerPreview>
     );
@@ -27,13 +39,12 @@ Profile.propTypes = {
 }
 
 
-function Player (props) {
-    console.log(props);
+function Player({label, score, profile}) {
     return (
         <div>
-            <h1  className='header'>{props.label}</h1>
-            <h3 style={{textAlign:'center'}}>{'Score: ' + props.score}</h3>
-            <Profile info={props.profile} />
+            <h1  className='header'>{label}</h1>
+            <h3 style={{textAlign:'center'}}>{`Score: ${score}`}</h3>
+            <Profile info={profile} />
         </div>
     );
 }
@@ -57,37 +68,31 @@ class Results extends React.Component{
     }
 
     componentDidMount() {
-        var players = queryString.parse(this.props.location.search);
-        var playersArray = [];
-        Object.keys(players).map(key=> playersArray.push(players[key]));
-        api.battle(playersArray)
-            .then(function(results)  {
-                if(results === null) {
-                    return this.setState(function () {
-                        return {
+        const { location: {search} } = this.props;
+        const { playerOneName, playerTwoName } = queryString.parse(search);
+
+        api.battle([playerOneName, playerTwoName])
+            .then(results => results === null 
+                    ? this.setState(() => ({
                             error:'Looks like there was an error. Check that both users exist.',
                             loading: false
-                        };
-                    });
-                }
-
-                this.setState(function () {
-                    return {
+                        }))
+                    : this.setState(() => ({
                         error: null,
                         loading: false,
                         winner: results[0],
                         loser: results[1]
-                    };
-                });
-
-            }.bind(this));
+                    }))
+            );
     }
 
     render() {
-        var error = this.state.error;
-        var winner = this.state.winner;
-        var loser = this.state.loser;
-        var loading = this.state.loading;
+        const {
+            error,
+            winner,
+            loser,
+            loading 
+        } = this.state;
 
         if (loading) {
             return <Loading />

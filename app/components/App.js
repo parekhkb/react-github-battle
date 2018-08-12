@@ -1,13 +1,13 @@
-var React = require('react');
-var Popular = require('./Popular');
-var ReactRouter = require('react-router-dom');
-var BrowserRouter = ReactRouter.BrowserRouter;
-var Route = ReactRouter.Route;
-var Nav = require('./Nav');
-var Home = require('./Home');
-var Battle = require('./Battle');
-var Switch = ReactRouter.Switch;
-var Results = require('./Results');
+const React = require('react');
+const Popular = require('./Popular');
+const ReactRouter = require('react-router-dom');
+const BrowserRouter = ReactRouter.BrowserRouter;
+const Route = ReactRouter.Route;
+const Nav = require('./Nav');
+const Home = require('./Home');
+const Battle = require('./Battle');
+const Switch = ReactRouter.Switch;
+const Results = require('./Results');
 
 class App extends React.Component {
     render(){

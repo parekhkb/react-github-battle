@@ -1,50 +1,50 @@
-var React = require('react');
-var PropTypes = require('prop-types');
-var api = require('../utils/api');
-var Loading = require('./Loading');
+const React = require('react');
+const PropTypes = require('prop-types');
+const api = require('../utils/api');
+const Loading = require('./Loading');
 
-function SelectedLanguage(props){
-    var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python', 'CSharp'];
-    return(
-    <ul className='languages'>
-        {languages.map(function(lang){
-            return(
-                <li style={lang === props.selectedLanguage ? {color:'#d0021b'} : null}
-                    key={lang}
-                    onClick={props.onSelect.bind(null, lang)}>
-                {lang}
-                </li>
-            )
-        })}
-    </ul>
-)};
+const languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python', 'CSharp'];
+
+function SelectedLanguage({selectedLanguage, onSelect}) {
+    return (
+        <ul className='languages'>
+            {languages.map(lang => (
+                    <li style={lang === selectedLanguage ? {color:'#d0021b'} : null}
+                        key={lang}
+                        onClick={() => onSelect(lang)}>
+                    {lang}
+                    </li>
+                )
+            )}
+        </ul>
+    );
+}    
 
 SelectedLanguage.propTypes = {
     selectedLanguage: PropTypes.string.isRequired,
     onSelect: PropTypes.func.isRequired
 };
 
-function ReposGrid (props){
+function ReposGrid({ repos }) {
     return (
         <ul className="popular-list">
-            {props.repos.map(function(repo, index) {
-                return (
-                    <li key={repo.name} className='popular-item'>
-                        <div className='popular-rank'>#{index+1}</div>
+            {repos.map(({name, html_url, stargazers_count, owner }, index) => (
+                    <li key={name} className='popular-item'>
+                        <div className='popular-rank'>#{index + 1}</div>
                         <ul className='space-list-items'>
                             <li>
                                 <img 
                                     className='avatar'
-                                    src={repo.owner.avatar_url}
-                                    alt={'Avatar for ' + repo.owner.login} />
+                                    src={owner.avatar_url}
+                                    alt={`Avatar for ${owner.login}`} />
                             </li>
-                            <li><a href={repo.html_url}>{repo.name}</a></li>
-                            <li>@{repo.owner.login}</li>
-                            <li>{repo.stargazers_count} stars</li>
+                            <li><a href={html_url}>{name}</a></li>
+                            <li>@{owner.login}</li>
+                            <li>{stargazers_count} stars</li>
                         </ul>
                     </li>
-                );
-            })}
+                )
+            )}
         </ul>
     );
 }
@@ -69,26 +69,26 @@ class Popular extends React.Component{
     }
 
     updateLanguage(lang) {
-        this.setState({
-            selectedLanguage: lang,
+        this.setState(()=>({
+            selectedLanguage : lang,
             repos: null
-        });
+        }));
 
         api.fetchPopularRepos(lang)
-        .then(function(repos) {
-            this.setState({repos:repos});
-        }.bind(this));
+           .then(repos => this.setState(() => ({ repos })));
     }
 
     render() {
+        const {repos, selectedLanguage} = this.state;
+
         return (
             <div>
             <SelectedLanguage 
                 onSelect={this.updateLanguage} 
-                selectedLanguage={this.state.selectedLanguage} />
-            {!this.state.repos 
+                selectedLanguage={selectedLanguage} />
+            {!repos
                 ? <Loading text='Querying' speed={200}/>
-                : <ReposGrid repos={this.state.repos} />}
+                : <ReposGrid repos={repos} />}
             </div>
         )
     }
