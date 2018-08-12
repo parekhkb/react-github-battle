@@ -1,10 +1,10 @@
-const React = require('react');
-const queryString = require('query-string');
-const api = require('../utils/api');
-const Link = require('react-router-dom').Link;
-const PropTypes = require('prop-types');
-const PlayerPreview = require('./PlayerPreview');
-const Loading = require('./Loading');
+import React, { Component } from 'react';
+import queryString from 'query-string';
+import { battle } from '../utils/api';
+import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import PlayerPreview from './PlayerPreview';
+import Loading from './Loading';
 
 function Profile ({info}) {
     const {
@@ -55,35 +55,33 @@ Player.propTypes = {
     profile: PropTypes.object.isRequired,
 };
 
-class Results extends React.Component{
-    constructor(props){
-        super(props);
+class Results extends Component{
+    state = {
+        winner: null,
+        loser: null,
+        error: null,
+        loading: true
+    };
 
-        this.state = {
-            winner: null,
-            loser: null,
-            error: null,
-            loading: true
-        };
-    }
-
-    componentDidMount() {
+    async componentDidMount() {
         const { location: {search} } = this.props;
         const { playerOneName, playerTwoName } = queryString.parse(search);
 
-        api.battle([playerOneName, playerTwoName])
-            .then(results => results === null 
-                    ? this.setState(() => ({
-                            error:'Looks like there was an error. Check that both users exist.',
-                            loading: false
-                        }))
-                    : this.setState(() => ({
-                        error: null,
-                        loading: false,
-                        winner: results[0],
-                        loser: results[1]
-                    }))
-            );
+        const results = await battle([playerOneName, playerTwoName])
+        if(results === null) {
+            this.setState(() => ({
+                error:'Looks like there was an error. Check that both users exist.',
+                loading: false
+            }));
+
+        } else {
+            this.setState(() => ({
+                error: null,
+                loading: false,
+                winner: results[0],
+                loser: results[1]
+            }));
+        }
     }
 
     render() {
@@ -120,4 +118,4 @@ class Results extends React.Component{
     }
 }
 
-module.exports = Results;
+export default Results;

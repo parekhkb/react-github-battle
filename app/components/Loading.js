@@ -1,12 +1,19 @@
-const React = require('react');
-const PropTypes = require('prop-types');
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
-class Loading extends React.Component {
-    constructor(props){
-        super(props);
+class Loading extends Component { 
+    static defaultProps = {
+        text: 'Loading',
+        speed: 300
+    }
 
-        const { text } = props;
-        this.state = { text };
+    static propTypes = {
+        text: PropTypes.string,
+        speed: PropTypes.number
+    }
+
+    state = { 
+        text: this.props.text 
     }
 
     componentDidMount() {
@@ -32,15 +39,4 @@ class Loading extends React.Component {
     }
 }
 
-Loading.defaultProps = {
-    text: 'Loading',
-    speed: 300
-};
-
-Loading.propTypes = {
-    text: PropTypes.string,
-    speed: PropTypes.number
-
-}
-
-module.exports = Loading;
+export default Loading;
